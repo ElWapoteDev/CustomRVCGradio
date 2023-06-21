@@ -2078,7 +2078,25 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
 
                         descargar_modelo = gr.Button('Descargar', variant="primary")
 
+                    with gr.Column():
+                        gr.Markdown('Importar modelo de drive (carpeta /ModelosRVC)')
 
+                        modelo_importar = gr.Dropdown(
+                            label='Selecciona el modelo para importar',
+                            choices=[],
+                            interactive=True,
+                            value=''
+                        )
+
+                        output_importacion = gr.Textbox(
+                            value='',
+                            label='Resultado de la importacion:',
+                            interactive=False,
+                            show_label=True                        
+                        )
+
+                        importar_modelo = gr.Button('Importar', variant='primary')
+                        recargar_modelos = gr.Button('Actualizar', variant='secondary')
             
 
         with gr.TabItem(i18n("模型推理")):
