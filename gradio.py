@@ -1529,7 +1529,7 @@ def Separar(AudioPath, TitArchivo, OutputPath='/content/separados'):
         os.makedirs(OutputPath, exist_ok=True)
 
     Folder = f'{OutputPath}/htdemucs'
-    FolderEstaSong = f'{Folder}\{TitArchivo.replace(".mp3", "")}'
+    FolderEstaSong = f'{Folder}/{TitArchivo.replace(".mp3", "")}'
 
     Instrumental = f'{FolderEstaSong}/no_vocals.wav'
     Vocal = f'{FolderEstaSong}/vocals.wav'
