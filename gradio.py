@@ -1516,7 +1516,7 @@ def descargar_youtube(enlace, path='/content/descargas'):
         video = Instancia.streams.filter(only_audio=True).first()
         out_file = video.download(output_path=path)
         base, ext = os.path.splitext(out_file)
-        new_file = base.replace(' ', '_') + '.mp3'
+        new_file = base.replace(' ', '_').replace('(', '').replace(')', '') + '.mp3'
         os.rename(out_file, new_file)
 
         return new_file
@@ -1606,7 +1606,7 @@ def comenzar_inferencia(
             #input_audio0 = descarga
         else:
             return 'Shi jala bebe uwu', (None, None)
-    nombre_archivo_sin_espacios = input_audio0.replace(" ", "_")
+    nombre_archivo_sin_espacios = input_audio0.replace(" ", "_").replace('(', '').replace(')', '')
     os.rename(input_audio0, nombre_archivo_sin_espacios)  
     input_audio0 = nombre_archivo_sin_espacios
     print('Separando audio...')
