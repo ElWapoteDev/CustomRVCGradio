@@ -22,6 +22,7 @@ shutil.rmtree("%s/runtime/Lib/site-packages/uvr5_pack" % (now_dir), ignore_error
 os.makedirs(tmp, exist_ok=True)
 os.makedirs(os.path.join(now_dir, "logs"), exist_ok=True)
 os.makedirs(os.path.join(now_dir, "weights"), exist_ok=True)
+os.makedirs('/content/drive/MyDrive/ModelosRVC/', exist_ok=True)
 os.environ["TEMP"] = tmp
 warnings.filterwarnings("ignore")
 torch.manual_seed(114514)
@@ -35,6 +36,7 @@ i18n.print()
 ngpu = torch.cuda.device_count()
 gpu_infos = []
 mem = []
+modelo_pathss = {}
 if (not torch.cuda.is_available()) or ngpu == 0:
     if_gpu_ok = False
 else:
@@ -1792,9 +1794,6 @@ def mover_archivos(path):
         print(f'Ocurrio algo al mover pesos y index: {err}')
         return False, err
     
-
-
-
 def descargar_modelo_extraer(enlace):
     succ, info = download_drive(enlace=enlace)
 
@@ -1811,6 +1810,66 @@ def descargar_modelo_extraer(enlace):
         return f'Success: {succ}, Info: {err}'
     else:
         return info
+
+def obtener_mis_modelos():
+    global modelo_pathss
+    path_modelos = '/content/drive/MyDrive/ModelosRVC/'
+    path_modelos_finished = '/content/drive/MyDrive/RVC_Backup/Finished/'
+    
+    modelos_nombres = []
+    
+    for modelo in os.listdir(path_modelos):
+        if modelo.endswith('/zip'):
+            modelos_nombres.append(modelo)
+            modelo_pathss[modelo] = {
+                'path': os.path.join(path_modelos, modelo),
+                'tipo': 'zip'
+            } 
+        else:
+            continue
+    
+    if os.path.exists(path_modelos_finished):
+        for modelo in os.listdir(path_modelos):
+            if modelo.endswith('/zip') and not modelo in modelo_pathss:
+                modelos_nombres.append(modelo)
+                modelo_pathss[modelo] = {
+                    'path': os.path.join(path_modelos_finished, modelo),
+                    'tipo': 'zip'
+                } 
+            else:
+                continue
+    
+    return modelos_nombres
+
+def importar_modelo_de_drive(modelo):
+    global modelo_pathss
+
+    if modelo in modelo_pathss:
+        path_modelo = modelo_chose[modelo]['path']
+        tipo_archivo = modelo_chose[modelo]['tipo']
+        meta_ruta = '/content/descargas_modelos/'
+
+        os.makedirs(meta_ruta, exist_ok=True)
+
+        ruta_nueva = f'{meta_ruta}{os.path.basename(path_modelo)}'
+
+        if tipo_archivo == 'zip':
+            shutil.copyfile(path_modelo, ruta_nueva)
+            descomprimido = descomprimir_archivo_zip(ruta_nueva, '/content/modelos_descomprimidos')
+            succ, err = mover_archivos(descomprimido)
+
+            try:
+                os.remove(info)
+                shutil.rmtree(descomprimido)
+            except Exception as caca:
+                print(f'No se pudo borrar: {caca}')
+
+            return f'Success: {succ}, Info: {err}'      
+        else:
+            return 'No es zip'
+    else:
+        return 'No se encuentra'      
+
 
 with gr.Blocks(theme=gr.themes.Soft()) as app:
     gr.HTML("<h1> The Mangio-RVC-Fork 💻 </h1>")
@@ -2030,7 +2089,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
 
             with gr.TabItem('Utilidades'):
                 with gr.Row():
-                    with gr.Column():
+                    with gr.Box():
                         gr.Markdown('Descargar modelo de drive')
 
                         enlace_drive = gr.Textbox(
@@ -2059,7 +2118,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
                             outputs=[output_descarga]
                         )
 
-                    with gr.Column():
+                    with gr.Box():
                         gr.Markdown('Descargar modelo de la base de modelos')
 
                         modelo_chose = gr.Dropdown(
@@ -2078,8 +2137,8 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
 
                         descargar_modelo = gr.Button('Descargar', variant="primary")
 
-                    with gr.Column():
-                        gr.Markdown('Importar modelo de drive (carpeta /ModelosRVC)')
+                    with gr.Box():
+                        gr.Markdown('Importar modelo de drive (carpeta /ModelosRVC/ o /RVC_Backup/Finished/)')
 
                         modelo_importar = gr.Dropdown(
                             label='Selecciona el modelo para importar',
@@ -2097,6 +2156,18 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
 
                         importar_modelo = gr.Button('Importar', variant='primary')
                         recargar_modelos = gr.Button('Actualizar', variant='secondary')
+
+                        recargar_modelos.click(
+                            fn=obtener_mis_modelos,
+                            inputs=[],
+                            outputs=[modelo_importar]
+                        )
+
+                        importar_modelo.click(
+                            fn=importar_modelo_de_drive,
+                            inputs=[modelo_importar],
+                            outputs=[output_importacion]
+                        )
             
 
         with gr.TabItem(i18n("模型推理")):
