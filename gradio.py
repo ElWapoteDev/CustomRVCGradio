@@ -1608,6 +1608,7 @@ def comenzar_inferencia(
             return 'Shi jala bebe uwu', (None, None)
     nombre_archivo_sin_espacios = input_audio0.replace(" ", "_")
     os.rename(input_audio0, nombre_archivo_sin_espacios)  
+    input_audio0 = nombre_archivo_sin_espacios
     print('Separando audio...')
     if separaraudio == 'Separar':
         instrumental, vocal = Separar(input_audio0, os.path.basename(input_audio0))
