@@ -1811,7 +1811,7 @@ def descargar_modelo_extraer(enlace):
     else:
         return info
 
-with gr.Blocks() as app:
+with gr.Blocks(theme=gr.themes.Soft()) as app:
     gr.HTML("<h1> The Mangio-RVC-Fork 💻 </h1>")
     gr.Markdown(
         value=i18n(
