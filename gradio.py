@@ -1819,7 +1819,7 @@ def obtener_mis_modelos():
     modelos_nombres = []
     
     for modelo in os.listdir(path_modelos):
-        if modelo.endswith('/zip'):
+        if modelo.endswith('.zip'):
             modelos_nombres.append(modelo)
             modelo_pathss[modelo] = {
                 'path': os.path.join(path_modelos, modelo),
@@ -1830,7 +1830,7 @@ def obtener_mis_modelos():
     
     if os.path.exists(path_modelos_finished):
         for modelo in os.listdir(path_modelos):
-            if modelo.endswith('/zip') and not modelo in modelo_pathss:
+            if modelo.endswith('.zip') and not modelo in modelo_pathss:
                 modelos_nombres.append(modelo)
                 modelo_pathss[modelo] = {
                     'path': os.path.join(path_modelos_finished, modelo),
