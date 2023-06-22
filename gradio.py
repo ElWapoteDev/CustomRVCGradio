@@ -5,6 +5,8 @@ import subprocess
 from pydub import AudioSegment
 import gdown
 import zipfile
+import requests
+import json
 
 os.environ["no_proxy"] = "localhost, 127.0.0.1, ::1"
 import threading
@@ -37,6 +39,7 @@ ngpu = torch.cuda.device_count()
 gpu_infos = []
 mem = []
 modelo_pathss = {}
+modelukos = {}
 if (not torch.cuda.is_available()) or ngpu == 0:
     if_gpu_ok = False
 else:
@@ -1870,6 +1873,28 @@ def importar_modelo_de_drive(modelo):
     else:
         return 'No se encuentra'  
 
+def obtener_modelos_base():
+    global modelukos
+    url = 'https://raw.githubusercontent.com/ElWapoteDev/CustomRVCGradio/main/base_modelos.json'
+    
+    nombres_modelos = []
+
+    try:
+        modelos = requests.get(url=url)
+        modelukos = modelos.json()
+    except Exception as err:
+        return str(err)
+    
+    for key, value in modelukos.items():
+        nombres_modelos.append(key)
+
+    return {'choices': nombres_modelos, "__type__": "update"}
+
+def descargar_de_base(modelo):
+    if modelo in modelukos:
+        return descargar_modelo_extraer(modelukos[modelo])
+    return 'Ocurrio un error con este modelo :('
+
 
 with gr.Blocks(theme=gr.themes.Soft()) as app:
     gr.HTML("<h1> The Mangio-RVC-Fork 💻 </h1>")
@@ -2136,6 +2161,19 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
                         )
 
                         descargar_modelo = gr.Button('Descargar', variant="primary")
+                        actualizar_base = gr.Button('Actualizar', variant='secondary')
+
+                        descargar_modelo.click(
+                            fn=descargar_de_base,
+                            inputs=[modelo_chose],
+                            outputs=[output_descarga]
+                        )
+
+                        actualizar_base.click(
+                            fn=obtener_modelos_base,
+                            inputs=[],
+                            outputs=[modelo_chose]
+                        )
 
                     with gr.Box():
                         gr.Markdown('Importar modelo de drive (carpeta /ModelosRVC/ o /RVC_Backup/Finished/)')
