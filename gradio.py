@@ -1839,7 +1839,7 @@ def obtener_mis_modelos():
             else:
                 continue
     
-    return modelos_nombres
+    return {'choices': modelos_nombres, "__type__": "update"}
 
 def importar_modelo_de_drive(modelo):
     global modelo_pathss
