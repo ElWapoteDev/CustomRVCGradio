@@ -1883,7 +1883,7 @@ def obtener_modelos_base():
         modelos = requests.get(url=url)
         modelukos = modelos.json()
     except Exception as err:
-        return str(err)
+        return {'choices': []}
     
     for key, value in modelukos.items():
         nombres_modelos.append(key)
@@ -2146,11 +2146,13 @@ with gr.Blocks(theme=gr.themes.Soft()) as app:
                     with gr.Box():
                         gr.Markdown('Descargar modelo de la base de modelos')
 
+                        elecciones = obtener_modelos_base()
+
                         modelo_chose = gr.Dropdown(
                             label='Selecciona el modelo que deseas descargar:',
-                            choices=['Test1', 'Test2'],
+                            choices=elecciones['choices'],
                             interactive=True,
-                            value=''
+                            value='',
                         )
 
                         output_descarga = gr.Textbox(
