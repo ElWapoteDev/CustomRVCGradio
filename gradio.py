@@ -1875,24 +1875,40 @@ def importar_modelo_de_drive(modelo):
 
 def obtener_modelos_base():
     global modelukos
-    url = 'https://raw.githubusercontent.com/ElWapoteDev/CustomRVCGradio/main/base_modelos.json'
+    ruta_modelos = '/content/drive/MyDrive/ModelosCompartidos'
     
     nombres_modelos = []
 
-    try:
-        modelos = requests.get(url=url)
-        modelukos = modelos.json()
-    except Exception as err:
-        return {'choices': []}
-    
-    for key, value in modelukos.items():
-        nombres_modelos.append(key)
+    for modelo in os.listdir(ruta_modelos):
+        if modelo.endswith('.zip', ''):
+            juntado = os.path.join(ruta_modelos, modelo)
+            nombres_modelos.append(modelo)
+
+            modelukos[modelo] = juntado
 
     return {'choices': nombres_modelos, "__type__": "update"}
 
 def descargar_de_base(modelo):
     if modelo in modelukos:
-        return descargar_modelo_extraer(modelukos[modelo])
+        path_modelo = modelukos[modelo]
+        meta_ruta = '/content/descargas_modelos/'
+
+        os.makedirs(meta_ruta, exist_ok=True)
+
+        ruta_nueva = f'{meta_ruta}{os.path.basename(path_modelo)}'   
+
+        shutil.copyfile(path_modelo, ruta_nueva)
+        descomprimido = descomprimir_archivo_zip(ruta_nueva, '/content/modelos_descomprimidos')
+        succ, err = mover_archivos(descomprimido)
+
+        try:
+            os.remove(info)
+            shutil.rmtree(descomprimido)
+        except Exception as caca:
+            print(f'No se pudo borrar: {caca}')
+
+        return f'Success: {succ}, Info: {err}'  
+
     return 'Ocurrio un error con este modelo :('
 
 
