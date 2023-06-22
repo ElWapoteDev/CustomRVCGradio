@@ -1845,8 +1845,8 @@ def importar_modelo_de_drive(modelo):
     global modelo_pathss
 
     if modelo in modelo_pathss:
-        path_modelo = modelo_chose[modelo]['path']
-        tipo_archivo = modelo_chose[modelo]['tipo']
+        path_modelo = modelo_pathss[modelo]['path']
+        tipo_archivo = modelo_pathss[modelo]['tipo']
         meta_ruta = '/content/descargas_modelos/'
 
         os.makedirs(meta_ruta, exist_ok=True)
@@ -1868,7 +1868,7 @@ def importar_modelo_de_drive(modelo):
         else:
             return 'No es zip'
     else:
-        return 'No se encuentra'      
+        return 'No se encuentra'  
 
 
 with gr.Blocks(theme=gr.themes.Soft()) as app:
