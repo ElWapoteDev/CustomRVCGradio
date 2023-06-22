@@ -1880,7 +1880,7 @@ def obtener_modelos_base():
     nombres_modelos = []
 
     for modelo in os.listdir(ruta_modelos):
-        if modelo.endswith('.zip', ''):
+        if modelo.endswith('.zip'):
             juntado = os.path.join(ruta_modelos, modelo)
             nombres_modelos.append(modelo)
 
